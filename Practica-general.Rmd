@@ -1,0 +1,145 @@
+---
+title: "Practica General - Curso R"
+author: "María Sánchez García"
+date: "1/13/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Práctica General - Curso R
+
+Primero instalamos y/o cargamos todos los paquetes necesarios para desarrollar el código
+
+```{r}
+library(dplyr)
+library(plyr)
+library(tidyverse)
+
+citation("base")
+citation("dplyr")
+citation("plyr")
+citation("tidyverse")
+```
+
+Ahora cargamos los datos de palmerpenguins con los que vamos a trabajar
+
+```{r}
+library(palmerpenguins)
+data(package = "palmerpenguins")
+citation("palmerpenguins")
+```
+
+Extraemos los datos del paquete y analizamos su estructura
+
+```{r}
+data("penguins")
+str(penguins)   #estructura
+class(penguins) #tipo
+names(penguins) #nombres de las variables
+
+summary(penguins) #resumen de los datos
+View(penguins)
+
+str(penguins_raw)
+class(penguins_raw)
+names(penguins_raw)
+
+summary(penguins_raw)
+View(penguins_raw)
+```
+
+#### (1) Número de individuos totales, masculinos y femeninos por especie
+
+Para este punto la información viene en ambas variables ("penguins" y "penguins_raw"), pero utilizamos "penguins" por simplicidad.
+
+```{r}
+sp_sex <- table(penguins$species, penguins$sex) #tabla de frecuencia
+View(sp_sex)
+
+sp_sex
+```
+
+#### La media, desviación estándar, valor mínimo y máximo de la longitud y profundidad del pico, la longitud de la aleta y el tamaño.
+
+```{r}
+sizes <- penguins %>%
+  dplyr::group_by(species) %>% #se agrupan los datos por especies
+  dplyr::summarise(bill_lenght_mean = mean(bill_length_mm, na.rm = TRUE), bill_lenght_sd = sd(bill_length_mm, na.rm = TRUE), bill_depth_mean = mean(bill_depth_mm, na.rm = TRUE), bill_depth_sd = sd(bill_depth_mm, na.rm = TRUE), flipper_length_mean = mean(flipper_length_mm, na.rm = TRUE), flipper_length_sd = sd(flipper_length_mm, na.rm = TRUE), body_mass_mean = mean(body_mass_g, na.rm = TRUE), body_mass_sd = sd(body_mass_g, na.rm = TRUE))
+#se incluye la media y la desviacion estandar de los parametros requeridos
+
+View(sizes)
+sizes 
+```
+
+#### (2) Un gráfico de barras que represente el número de individuos muestreados de cada especie en cada isla.
+
+Representando las especies en diferentes colores (Chinstrap -- morado, Gentoo -- azul, Adelie -- naranja).
+
+Cargamos paquete ggplot para graficar
+
+```{r}
+library(ggplot2)
+library(scales)
+citation("ggplot2")
+
+ggplot(data = penguins, aes(x = island, fill = species)) + 
+  geom_bar(position = "dodge") +
+  scale_fill_manual(values = c("orange","purple","blue")) +
+  scale_y_continuous(breaks = c(0, 25, 50, 75, 100, 125, 150, 175)) +
+  geom_text(aes(label = ..count..), stat= "count", position = position_dodge(0.9), vjust = -0.5) +
+  labs(y = "Number of samples", x = "Island", title = "Number of penguins sampled per island")
+
+graph
+```
+
+#### Contesta a las siguientes preguntas:
+
+##### 1) ¿Qué especie se ha muestreado en las tres islas?
+
+Adeile
+
+##### 2) ¿Cuántos individuos se han muestreado de la isla Dream?
+
+```{r}
+table(penguins$island)
+```
+
+124
+
+#### (3) Un gráfico multipanel de cajas y bigotes del tamaño de los pingüinos según su sexo, donde aparezca un panel para cada especie.
+
+```{r}
+datos <- penguins[!is.na(penguins$sex),] #se quitan los NA de la variable "sexo"
+
+ggplot(data = datos, aes(x = sex, y = body_mass_g, fill = sex)) +
+  geom_boxplot() +
+  facet_grid(cols = vars(species), scales = "free") +
+  labs(x = "Sex", y = "Body mass") +
+  scale_y_continuous(labels = label_number_si(unit = "g"))
+
+```
+
+#### Contesta a las siguientes preguntas:
+
+##### ¿Qué especie tiene mayor tamaño?
+
+```{r}
+datos %>%
+  group_by(species) %>%
+  dplyr::summarise(body_mass_g = max(body_mass_g))
+```
+
+Gentoo
+
+##### ¿En qué especie las hembras y los machos tienen un tamaño más similar?
+
+```{r}
+datos %>%
+  dplyr::group_by(species, sex) %>%
+  dplyr::summarise(body_mass_g = mean(body_mass_g))
+```
+
+Chinstrap
