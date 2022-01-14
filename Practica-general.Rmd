@@ -6,22 +6,15 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE)
 ```
 
-# Práctica General - Curso R
+Primero instalamos y/o cargamos todos los paquetes necesarios para desarrollar el código (las citas están al final del documento)
 
-Primero instalamos y/o cargamos todos los paquetes necesarios para desarrollar el código
-
-```{r}
+```{r, eval=FALSE}
 library(dplyr)
 library(plyr)
 library(tidyverse)
-
-citation("base")
-citation("dplyr")
-citation("plyr")
-citation("tidyverse")
 ```
 
 Ahora cargamos los datos de palmerpenguins con los que vamos a trabajar
@@ -29,7 +22,6 @@ Ahora cargamos los datos de palmerpenguins con los que vamos a trabajar
 ```{r}
 library(palmerpenguins)
 data(package = "palmerpenguins")
-citation("palmerpenguins")
 ```
 
 Extraemos los datos del paquete y analizamos su estructura
@@ -39,26 +31,20 @@ data("penguins")
 str(penguins)   #estructura
 class(penguins) #tipo
 names(penguins) #nombres de las variables
-
 summary(penguins) #resumen de los datos
-View(penguins)
 
 str(penguins_raw)
 class(penguins_raw)
 names(penguins_raw)
-
 summary(penguins_raw)
-View(penguins_raw)
 ```
 
 #### (1) Número de individuos totales, masculinos y femeninos por especie
 
 Para este punto la información viene en ambas variables ("penguins" y "penguins_raw"), pero utilizamos "penguins" por simplicidad.
 
-```{r}
+```{r, eval = TRUE}
 sp_sex <- table(penguins$species, penguins$sex) #tabla de frecuencia
-View(sp_sex)
-
 sp_sex
 ```
 
@@ -70,7 +56,6 @@ sizes <- penguins %>%
   dplyr::summarise(bill_lenght_mean = mean(bill_length_mm, na.rm = TRUE), bill_lenght_sd = sd(bill_length_mm, na.rm = TRUE), bill_depth_mean = mean(bill_depth_mm, na.rm = TRUE), bill_depth_sd = sd(bill_depth_mm, na.rm = TRUE), flipper_length_mean = mean(flipper_length_mm, na.rm = TRUE), flipper_length_sd = sd(flipper_length_mm, na.rm = TRUE), body_mass_mean = mean(body_mass_g, na.rm = TRUE), body_mass_sd = sd(body_mass_g, na.rm = TRUE))
 #se incluye la media y la desviacion estandar de los parametros requeridos
 
-View(sizes)
 sizes 
 ```
 
@@ -80,11 +65,12 @@ Representando las especies en diferentes colores (Chinstrap -- morado, Gentoo --
 
 Cargamos paquete ggplot para graficar
 
-```{r}
+```{r, eval=FALSE}
 library(ggplot2)
 library(scales)
-citation("ggplot2")
+```
 
+```{r,eval=TRUE}
 ggplot(data = penguins, aes(x = island, fill = species)) + 
   geom_bar(position = "dodge") +
   scale_fill_manual(values = c("orange","purple","blue")) +
@@ -92,7 +78,6 @@ ggplot(data = penguins, aes(x = island, fill = species)) +
   geom_text(aes(label = ..count..), stat= "count", position = position_dodge(0.9), vjust = -0.5) +
   labs(y = "Number of samples", x = "Island", title = "Number of penguins sampled per island")
 
-graph
 ```
 
 #### Contesta a las siguientes preguntas:
@@ -143,3 +128,23 @@ datos %>%
 ```
 
 Chinstrap
+
+#### Referencias de los paquetes utilizados:
+
+```{r, eval=FALSE}
+citation("base")
+citation("dplyr")
+citation("plyr")
+citation("tidyverse")
+citation("palmerpenguins")
+citation("ggplot2")
+citation("scales")
+```
+
+(1) R Core Team (2020). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. URL <https://www.R-project.org/>.
+(2) Hadley Wickham, Romain François, Lionel Henry and Kirill Müller (2021). dplyr: A Grammar of Data Manipulation. R package version 1.0.7. <https://CRAN.R-project.org/package=dplyr>
+(3) Hadley Wickham (2011). The Split-Apply-Combine Strategy for Data Analysis. Journal of Statistical Software, 40(1), 1-29. URL <http://www.jstatsoft.org/v40/i01/>.
+(4) Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43), 1686, <https://doi.org/10.21105/joss.01686>
+(5) Horst AM, Hill AP, Gorman KB (2020). palmerpenguins: Palmer Archipelago (Antarctica) penguin data. R package version 0.1.0. <https://allisonhorst.github.io/palmerpenguins/>
+(6) H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York, 2016.
+(7) Hadley Wickham and Dana Seidel (2020). scales: Scale Functions for Visualization. R package version 1.1.1. <https://CRAN.R-project.org/package=scales>
